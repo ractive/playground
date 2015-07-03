@@ -2,6 +2,14 @@ package ch.ractive.tree;
 
 public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 
+	public static <C extends Comparable<C>> boolean lt(C a, C b) {
+		return a.compareTo(b) < 0;
+	}
+	
+	public static <C extends Comparable<C>> boolean gt(C a, C b) {
+		return a.compareTo(b) > 0;
+	}
+	
 	public BinarySearchTree() {}
 	
 	public BinarySearchTree(Node<T> root) {
@@ -13,7 +21,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		Node<T> x = getRoot();
 		while (x != null) {
 			y = x;
-			if (z.getKey().compareTo(x.getKey()) < 0) {
+			if (lt(z.getKey(), x.getKey())) {
 				x = x.getLeft();
 			} else {
 				x = x.getRight();
@@ -22,7 +30,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		z.setParent(y);
 		if (y == null) {
 			setRoot(z);
-		} else if (z.getKey().compareTo(y.getKey()) < 0) {
+		} else if (lt(z.getKey(), y.getKey())) {
 			y.setLeft(z);
 		} else {
 			y.setRight(z);
@@ -37,7 +45,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		if (node == null) {
 			return true;
 		}
-		if ((min != null && node.getKey().compareTo(min) < 0) ||(max != null && node.getKey().compareTo(max) > 0)) {
+		if ((min != null && lt(node.getKey(), min)) ||(max != null && gt(node.getKey(), max))) {
 			return false;
 		}
 		return verify(node.getLeft(), min, node.getKey()) && verify(node.getRight(), node.getKey(), max);
@@ -51,7 +59,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		if (x == null || x.getKey().equals(key)) {
 			return x;
 		}
-		if (key.compareTo(x.getKey()) < 0) {
+		if (lt(key, x.getKey())) {
 			return search(x.getLeft(), key);
 		} else {
 			return search(x.getRight(), key);
