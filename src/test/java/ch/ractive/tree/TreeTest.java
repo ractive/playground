@@ -1,6 +1,7 @@
 package ch.ractive.tree;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -88,6 +89,13 @@ public class TreeTest {
 	
 	@Test
 	public void verifyFalse() {
+		/*
+		 *         20
+		 *       /    \
+		 *     10      30
+		 *            /  \
+		 *           5    40   
+		 */
 		Node<Integer> root = Node.of(20);
 		Node<Integer> n30 = Node.of(30).left(5).right(40);
 		
@@ -99,6 +107,13 @@ public class TreeTest {
 	
 	@Test
 	public void verifyTrue() {
+		/*
+		 *         20
+		 *       /    \
+		 *     10      30
+		 *            /  \
+		 *          25    40   
+		 */
 		Node<Integer> root = Node.of(20);
 		Node<Integer> n30 = Node.of(30).left(25).right(40);
 		
@@ -106,6 +121,41 @@ public class TreeTest {
 		
 		BinarySearchTree<Integer> bst = new BinarySearchTree<>(root);
 		assertTrue(bst.verify());
+	}
+	
+	@Test
+	public void inOrderSuccessor() {
+		/*
+		 *           20
+		 *       /       \
+		 *     10         30
+		 *   /   \       /  \
+		 *  1    11    25    40
+		 *            /  \
+		 *          24    26
+		 */
+		Node<Integer> n20 = Node.of(20);
+		Node<Integer> n24 = Node.of(25);
+		Node<Integer> n26 = Node.of(25);
+		Node<Integer> n25 = Node.of(25).left(n24).right(n26);
+		Node<Integer> n40 = Node.of(40);
+		Node<Integer> n30 = Node.of(30).left(n25).right(n40);
+		Node<Integer> n1 = Node.of(1);
+		Node<Integer> n11 = Node.of(11);
+		Node<Integer> n10 = Node.of(10).left(n1).right(n11);
+		n20.left(n10).right(n30);
+		
+		BinarySearchTree<Integer> bst = new BinarySearchTree<>(n20);
+		// 1 10 11 20 24 25 26 30 40
+		assertThat(bst.inOrderSuccessor(n1)).isEqualTo(n10);
+		assertThat(bst.inOrderSuccessor(n10)).isEqualTo(n11);
+		assertThat(bst.inOrderSuccessor(n11)).isEqualTo(n20);
+		assertThat(bst.inOrderSuccessor(n20)).isEqualTo(n24);
+		assertThat(bst.inOrderSuccessor(n24)).isEqualTo(n25);
+		assertThat(bst.inOrderSuccessor(n25)).isEqualTo(n26);
+		assertThat(bst.inOrderSuccessor(n26)).isEqualTo(n30);
+		assertThat(bst.inOrderSuccessor(n30)).isEqualTo(n40);
+		assertThat(bst.inOrderSuccessor(n40)).isNull();;
 	}
 	
 	@Test

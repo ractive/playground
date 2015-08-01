@@ -1,16 +1,21 @@
 package ch.ractive.tree;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter @Setter
 @NoArgsConstructor
 public class BinaryTree<T extends Comparable<T>> {
 	@Data(staticConstructor = "of")
+	@ToString(of = {"key"})
 	public static class Node<T extends Comparable<T>> {
 		private final T key;
 		private Node<T> parent;
@@ -19,6 +24,18 @@ public class BinaryTree<T extends Comparable<T>> {
 		public Node<T> left(Node<T> l) {
 			setLeft(l);
 			return this;
+		}
+		public void setLeft(Node<T> left) {
+			this.left = left;
+			if (left != null) {
+				this.left.setParent(this);
+			}
+		}
+		public void setRight(Node<T> right) {
+			this.right = right;
+			if (right != null) {
+				this.right.setParent(this);
+			}
 		}
 		public Node<T> left(T value) {
 			return left(Node.of(value));
@@ -46,6 +63,18 @@ public class BinaryTree<T extends Comparable<T>> {
 				return false;
 			}
 			return getParent().getLeft() == this;
+		}
+		
+		public boolean hasRightChild() {
+			return getRight() != null;
+		}
+	
+		public boolean hasLeftChild() {
+			return getLeft() != null;
+		}
+		
+		public boolean isLeaf() {
+			return !hasLeftChild() && !hasRightChild();
 		}
 	}
 	
@@ -96,6 +125,43 @@ public class BinaryTree<T extends Comparable<T>> {
 		inOrder(parent.getRight(), operation);
 	}
 	
+	public Node<T> leftMost(Node<T> node) {
+		if (!node.hasLeftChild()) {
+			return node;
+		}
+		return leftMost(node.getLeft());
+	}
+	
+	public Node<T> inOrderSuccessor(Node<T> node) {
+		if (node.hasRightChild() && node.getRight().isLeaf()) {
+			return node.getRight();
+		}
+		if (node.isLeftChild()) {
+			if (node.hasRightChild()) {
+				return inOrderSuccessor(node.getRight());
+			} else {
+				return node.getParent();
+			}
+		} else if (node.isRoot()) {
+			if (node.hasRightChild()) {
+				return leftMost(node.getRight());
+			} else {
+				return node;
+			}
+		} else {
+			// node is rightChild
+			// go upwards until you find a node with a right child != this one
+			boolean rightOnly = node.isRightChild();
+			Node<T> parent = node.getParent();
+			while (parent != null && parent.getRight() == node) {
+				rightOnly &= parent.isRightChild();
+				parent = parent.getParent();
+			}
+			// If you only visited children on the right side, the input was the right-most leaf, which has no successor
+			return rightOnly ? null : parent;
+		}
+	}
+	
 	public void rotateLeft(Node<T> node) {
 		Node<T> rightNode = node.getRight();
 		if (rightNode == null) {
@@ -133,5 +199,34 @@ public class BinaryTree<T extends Comparable<T>> {
 		node.setParent(leftNode);
 		node.setLeft(leftNode.getRight());
 		leftNode.setRight(node);
+	}
+	
+	private List<List<T>> l = new ArrayList<>();
+	
+	public void print() {
+		listOfDepths(root, 0);
+		for(List<T> dl : l) {
+			for (T t : dl) {
+				System.out.print(t);
+				System.out.print(" ");
+			}
+			System.out.println("");
+		}
+	}
+	
+	
+	public void listOfDepths(Node<T> n, int d) {
+		if (n != null) {
+			visit(n, d);
+			listOfDepths(n.getLeft(), d + 1);
+			listOfDepths(n.getRight(), d + 1);
+		}
+	}
+	
+	public void visit(Node<T> n, int d) {
+		if (l.size() < d + 1) {
+			l.add(new LinkedList<>());
+		}
+		l.get(d).add(n.getKey());
 	}
 }
