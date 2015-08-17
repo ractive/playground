@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+
 import org.junit.Test;
 
 import lombok.Getter;
@@ -91,5 +93,35 @@ public class MyHashMapTest {
 		assertEquals(myHashMap.get(new Dummy(10)), "10");
 		assertEquals(myHashMap.get(new Dummy(11)), "new11");
 		assertEquals(myHashMap.get(new Dummy(12)), "12");
+	}
+	
+	private static final int NO = 1_000_000;
+	
+	@Test
+	public void huge() {
+		hugeTest();
+	}
+	
+	private void hugeTest() {
+		MyHashMap<Integer, Integer> my = new MyHashMap<>(100000);
+		for (int i = 0; i < NO; ++i) {
+			my.put(i, i);
+		}
+		
+		for (int i = 0; i < NO; ++i) {
+			assertEquals(Integer.valueOf(i), my.get(i));
+		}
+	}
+	
+	@Test
+	public void huge2() {
+		HashMap<Integer, Integer> my = new HashMap<>(100000);
+		for (int i = 0; i < NO; ++i) {
+			my.put(i, i);
+		}
+		
+		for (int i = 0; i < NO; ++i) {
+			assertEquals(Integer.valueOf(i), my.get(i));
+		}
 	}
 }

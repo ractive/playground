@@ -125,41 +125,27 @@ public class BinaryTree<T extends Comparable<T>> {
 		inOrder(parent.getRight(), operation);
 	}
 	
-	public Node<T> leftMost(Node<T> node) {
-		if (!node.hasLeftChild()) {
-			return node;
+	public Node<T> leftMost(final Node<T> node) {
+		Node<T> c = node;
+		while (c.hasLeftChild()) {
+			c = c.left;
 		}
-		return leftMost(node.getLeft());
+		return c;
 	}
 	
-	public Node<T> inOrderSuccessor(Node<T> node) {
-		if (node.hasRightChild() && node.getRight().isLeaf()) {
-			return node.getRight();
+	public Node<T> inOrderSuccessor(final Node<T> node) {
+		if (node.hasRightChild()) {
+			return leftMost(node.right);
 		}
-		if (node.isLeftChild()) {
-			if (node.hasRightChild()) {
-				return inOrderSuccessor(node.getRight());
-			} else {
-				return node.getParent();
-			}
-		} else if (node.isRoot()) {
-			if (node.hasRightChild()) {
-				return leftMost(node.getRight());
-			} else {
-				return node;
-			}
-		} else {
-			// node is rightChild
-			// go upwards until you find a node with a right child != this one
-			boolean rightOnly = node.isRightChild();
-			Node<T> parent = node.getParent();
-			while (parent != null && parent.getRight() == node) {
-				rightOnly &= parent.isRightChild();
-				parent = parent.getParent();
-			}
-			// If you only visited children on the right side, the input was the right-most leaf, which has no successor
-			return rightOnly ? null : parent;
+		
+		// Get the first parent of a leftChild while walking up
+		Node<T> c = node;
+		Node<T> parent = node.parent;
+		while (parent != null && c.isRightChild()) {
+			c = parent;
+			parent = c.parent;
 		}
+		return parent;
 	}
 	
 	public void rotateLeft(Node<T> node) {

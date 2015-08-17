@@ -1,8 +1,10 @@
 package ch.ractive;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +42,22 @@ public class Duplicates {
 		}
 		
 		return duplicates;
+	}
+	
+	public int dup(int[] a) {
+		BitSet bs = new BitSet(a.length);
+		for (int i : a) {
+			if (bs.get(i + 1)) {
+				return i;
+			}
+			bs.set(i + 1);
+		}
+		return 0;
+	}
+	
+	@Test
+	public void bsTest() {
+		assertEquals(3, dup(new int[] {1, 2, 3, 4, 5, 3, 6, 7, 8}));
 	}
 	
 	@Test

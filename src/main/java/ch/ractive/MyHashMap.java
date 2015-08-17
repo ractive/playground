@@ -1,19 +1,24 @@
 package ch.ractive;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 public class MyHashMap<K, V> {
-	private final List<Entry<K, V>>[] buckets;
+	private final List<List<Entry<K, V>>> buckets;
 	private final int bucketSize;
 	
 	public MyHashMap(int bucketSize) {
 		this.bucketSize = bucketSize;
-		this.buckets = new List[bucketSize];
+		this.buckets = new ArrayList<>(bucketSize);
+		while (buckets.size() < bucketSize) {
+			buckets.add(new LinkedList<Entry<K, V>>());
+		}
 	}
 	
 	@Getter @Setter
@@ -22,30 +27,29 @@ public class MyHashMap<K, V> {
 		private final K key;
 		private final V value;
 	}
-	
 	public boolean put(K k, V v) {
-		int bucket = k.hashCode() % bucketSize;
-		if (buckets[bucket] == null) {
-			List<Entry<K, V>> l = new LinkedList<Entry<K, V>>();
-			l.add(new Entry<>(k, v));
-			buckets[bucket] = l;
+		List<Entry<K, V>> bucket = buckets.get(k.hashCode() % bucketSize);
+		if (bucket.isEmpty()) {
+			bucket.add(new Entry<>(k, v));
 			return false;
 		} else {
-			List<Entry<K, V>> l = buckets[bucket];
-			for(int i = 0; i < l.size(); ++i) {
-				if (l.get(i).getKey().equals(k)) {
-					l.set(i, new Entry<>(k, v));
+			ListIterator<Entry<K, V>> listIterator = bucket.listIterator();
+			while (listIterator.hasNext()) {
+				Entry<K, V> e = listIterator.next();
+				if (e.getKey().equals(k)) {
+					listIterator.set(new Entry<>(k, v));
 					return true;
 				}
 			}
-			l.add(new Entry<>(k, v));
+
+			bucket.add(new Entry<>(k, v));
 			return false;
 		}
 	}
 	
 	public V get(K k) {
 		int bucket = k.hashCode() % bucketSize;
-		List<Entry<K, V>> l = buckets[bucket];
+		List<Entry<K, V>> l = buckets.get(bucket);
 		if (l == null) {
 			return null;
 		}

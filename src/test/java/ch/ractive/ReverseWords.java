@@ -24,5 +24,6 @@ public class ReverseWords {
 	@Test
 	public void test() {
 		assertEquals("test a is This", reverseWords("This is a test"));
+		assertEquals("Times York New", reverseWords("New York Times"));
 	}
 }

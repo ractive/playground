@@ -10,6 +10,14 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		return a.compareTo(b) > 0;
 	}
 	
+	public static<C extends Comparable<C>> boolean lt(Node<C> a, Node<C> b) {
+		return a.getKey().compareTo(b.getKey()) < 0;
+	}
+	
+	public static <C extends Comparable<C>> boolean gt(Node<C> a, Node<C> b) {
+		return a.getKey().compareTo(b.getKey()) > 0;
+	}
+	
 	public BinarySearchTree() {}
 	
 	public BinarySearchTree(Node<T> root) {
@@ -21,7 +29,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		Node<T> x = getRoot();
 		while (x != null) {
 			y = x;
-			if (lt(z.getKey(), x.getKey())) {
+			if (lt(z, x)) {
 				x = x.getLeft();
 			} else {
 				x = x.getRight();
@@ -30,7 +38,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 		z.setParent(y);
 		if (y == null) {
 			setRoot(z);
-		} else if (lt(z.getKey(), y.getKey())) {
+		} else if (lt(z, y)) {
 			y.setLeft(z);
 		} else {
 			y.setRight(z);
